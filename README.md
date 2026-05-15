@@ -33,8 +33,11 @@ nmap -sn 192.168.1.0/24
 ### Purpose
 Performed host discovery to identify active devices on the local network.
 
+<<<<<<< HEAD
 ![Host Discovery](screenshots/host-discovery.png)
 
+=======
+>>>>>>> 80896792b9ca6ed81dd9f67875f96e00e6bbd706
 ---
 
 ## Service Enumeration
@@ -69,8 +72,11 @@ Performed a stealth SYN scan while bypassing standard host discovery.
 - Ports continued to appear filtered
 - Demonstrated firewall filtering behavior
 
+<<<<<<< HEAD
 ![Stealth Scan](screenshots/stealth-scan.png)
 
+=======
+>>>>>>> 80896792b9ca6ed81dd9f67875f96e00e6bbd706
 ---
 
 ## Aggressive Enumeration
@@ -92,8 +98,11 @@ Performed advanced enumeration including:
 - Filtering limited visibility
 - Traceroute identified target within one network hop
 
+<<<<<<< HEAD
 ![Aggressive Scan](screenshots/aggressive-scan.png)
 
+=======
+>>>>>>> 80896792b9ca6ed81dd9f67875f96e00e6bbd706
 ---
 
 ## Key Concepts Learned
