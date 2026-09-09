@@ -1,0 +1,683 @@
+# Project 3 — Linux Account & Access Management
+
+## Project Overview
+
+This project focused on Linux account management, user provisioning, group-based access control, password management, privilege separation, and account verification on a Raspberry Pi running Raspberry Pi OS.
+
+The goal was to simulate a small organization's user-management environment by creating different user roles, assigning users to appropriate security groups, configuring passwords, controlling administrative privileges, and verifying that users only had the access intended for their role.
+
+This project was performed remotely through SSH from a 2015 MacBook Air to the Raspberry Pi.
+
+---
+
+## Devices & Environment
+
+### Primary Device
+- Raspberry Pi 5
+- Raspberry Pi OS
+- Architecture: ARM64 / aarch64
+- Hostname: raspberrypi
+- Primary administrative account: dedfr
+- SSH Server: OpenSSH
+
+### Remote Administration Device
+- Apple MacBook Air (2015)
+- macOS
+- OpenSSH client
+- SSH key authentication configured during Project 2
+
+### Connection
+MacBook Air → SSH → Raspberry Pi 5
+
+Network connection:
+- Raspberry Pi LAN IP: 10.0.0.98
+- SSH Port: 22
+
+---
+
+# Project Objectives
+
+The objectives of this project were to:
+
+1. Understand Linux user account management.
+2. Create and manage Linux groups.
+3. Create separate user accounts for different organizational roles.
+4. Assign users to appropriate groups.
+5. Configure user passwords.
+6. Configure password aging information.
+7. Understand Linux privilege separation.
+8. Control sudo access.
+9. Verify account and group membership.
+10. Test administrative permissions from different user accounts.
+11. Perform all administration remotely through SSH.
+12. Document the configuration as a cybersecurity portfolio project.
+
+---
+
+# Phase 1 — Establish Remote Administration
+
+The project was performed remotely from the 2015 MacBook Air using SSH.
+
+The MacBook Air connected to the Raspberry Pi using:
+
+ssh dedfr@10.0.0.98
+
+After authentication, the remote shell displayed:
+
+dedfr@raspberrypi:~ $
+
+This confirmed that the MacBook Air could remotely administer the Raspberry Pi.
+
+The remote session was verified using:
+
+whoami
+
+hostname
+
+uptime
+
+These commands confirmed:
+
+- The authenticated account was dedfr.
+- The remote system was the Raspberry Pi.
+- The SSH connection was providing an interactive remote Linux shell.
+
+### Skills Demonstrated
+
+- SSH
+- Remote administration
+- Linux command line
+- Client/server communication
+- Network addressing
+- Authentication
+
+---
+
+# Phase 2 — Review Existing Accounts and Groups
+
+Before creating new accounts, existing Linux users and groups were examined.
+
+The following commands were used:
+
+getent passwd | tail -10
+
+getent group | tail -10
+
+These commands displayed existing system users and groups.
+
+The purpose of this phase was to understand the existing Linux account structure before modifying the system.
+
+---
+
+# Phase 3 — Create Organizational Groups
+
+Three groups were created to represent different organizational roles:
+
+1. cybersecurity
+2. developers
+3. labadmins
+
+Commands used:
+
+sudo groupadd cybersecurity
+
+sudo groupadd developers
+
+sudo groupadd labadmins
+
+The groups were then verified with:
+
+getent group cybersecurity
+
+getent group developers
+
+The resulting groups confirmed that the organizational groups had been successfully created.
+
+### Group Structure
+
+cybersecurity
+- Used for cybersecurity-related users.
+
+developers
+- Used for software development-related users.
+
+labadmins
+- Used for users requiring additional laboratory administration responsibilities.
+
+---
+
+# Phase 4 — Create User Accounts
+
+Two separate Linux user accounts were created to simulate different employees/roles.
+
+### Analyst Account
+
+The analyst account was created with:
+
+sudo useradd -m -s /bin/bash analyst
+
+### Developer Account
+
+The developer account was created with:
+
+sudo useradd -m -s /bin/bash developer
+
+The accounts were configured with:
+
+- Individual home directories
+- Bash as the login shell
+- Separate user IDs
+- Separate authentication credentials
+
+The accounts were verified using:
+
+getent passwd analyst
+
+getent passwd developer
+
+The output confirmed that both accounts existed and had valid home directories and login shells.
+
+---
+
+# Phase 5 — Configure User Passwords
+
+Individual passwords were assigned to each account.
+
+Commands used:
+
+sudo passwd analyst
+
+sudo passwd developer
+
+The system confirmed successful password changes with:
+
+passwd: password updated successfully
+
+This demonstrated how Linux administrators establish and manage authentication credentials for individual users.
+
+---
+
+# Phase 6 — Assign Users to Security Groups
+
+The analyst account was assigned to:
+
+- cybersecurity
+- labadmins
+
+Command:
+
+sudo usermod -aG cybersecurity analyst
+
+sudo usermod -aG labadmins analyst
+
+The developer account was assigned to:
+
+- developers
+
+Command:
+
+sudo usermod -aG developers developer
+
+Group membership was verified with:
+
+groups analyst
+
+groups developer
+
+The resulting configuration showed:
+
+analyst:
+- analyst
+- cybersecurity
+- labadmins
+
+developer:
+- developer
+- developers
+
+This demonstrated role-based access organization using Linux groups.
+
+---
+
+# Phase 7 — Configure Administrative Privileges
+
+The analyst account was given sudo access to simulate a user with elevated administrative responsibilities.
+
+The analyst account was added to the sudo group using:
+
+sudo usermod -aG sudo analyst
+
+The developer account was intentionally NOT given sudo access.
+
+This created a privilege separation model:
+
+### Analyst
+
+Role:
+Cybersecurity / Lab Administrator
+
+Groups:
+- cybersecurity
+- labadmins
+- sudo
+
+Administrative privileges:
+- YES
+
+### Developer
+
+Role:
+Developer
+
+Groups:
+- developers
+
+Administrative privileges:
+- NO
+
+This configuration follows the principle of least privilege by preventing the developer account from automatically receiving administrative access.
+
+---
+
+# Phase 8 — Verify Privilege Separation
+
+The analyst account was tested to verify administrative access.
+
+The account was switched to using:
+
+su - analyst
+
+The identity was confirmed with:
+
+whoami
+
+Output:
+
+analyst
+
+Administrative access was then tested with:
+
+sudo whoami
+
+The system returned:
+
+root
+
+This confirmed that the analyst account had administrative privileges.
+
+The session was then exited:
+
+exit
+
+---
+
+# Phase 9 — Test Developer Restrictions
+
+The developer account was tested separately.
+
+The account was accessed with:
+
+su - developer
+
+The identity was verified using:
+
+whoami
+
+Output:
+
+developer
+
+Administrative access was then tested with:
+
+sudo whoami
+
+The system returned an error indicating:
+
+developer is not in the sudoers file.
+
+This was an intentional result.
+
+It confirmed that the developer account could log in and perform normal user activities but could not execute administrative commands through sudo.
+
+The session was then exited:
+
+exit
+
+---
+
+# Phase 10 — Verify User IDs and Group Membership
+
+The final user configuration was verified using:
+
+id analyst
+
+id developer
+
+The analyst account showed membership in:
+
+- analyst
+- sudo
+- cybersecurity
+- labadmins
+
+The developer account showed membership in:
+
+- developer
+- developers
+
+Additional verification was performed with:
+
+groups analyst
+
+groups developer
+
+This confirmed that the intended role-based group configuration was successfully applied.
+
+---
+
+# Phase 11 — Password Aging & Account Security
+
+Linux password aging information was reviewed using:
+
+sudo chage -l analyst
+
+sudo chage -l developer
+
+The output displayed information including:
+
+- Last password change
+- Password expiration
+- Password inactivity
+- Account expiration
+- Minimum days between password changes
+- Maximum days between password changes
+- Warning period before password expiration
+
+Password status was also checked using:
+
+sudo passwd -S analyst
+
+sudo passwd -S developer
+
+This demonstrated how Linux administrators can inspect and manage password lifecycle policies.
+
+The project also included testing password-management commands such as:
+
+sudo passwd -u analyst
+
+sudo passwd -l analyst
+
+These commands demonstrate how an administrator can unlock or lock a user's password when account access needs to be controlled.
+
+---
+
+# Phase 12 — Final Account Structure
+
+The completed laboratory account structure was:
+
+Raspberry Pi
+│
+├── dedfr
+│   └── Primary administrative account
+│
+├── analyst
+│   ├── cybersecurity
+│   ├── labadmins
+│   └── sudo
+│
+└── developer
+    └── developers
+
+
+### Role-Based Access Model
+
+ANALYST
+
+Purpose:
+Cybersecurity and laboratory administration
+
+Groups:
+- cybersecurity
+- labadmins
+- sudo
+
+Privilege:
+Administrative
+
+
+DEVELOPER
+
+Purpose:
+Software development
+
+Groups:
+- developers
+
+Privilege:
+Standard user
+No sudo access
+
+---
+
+# Phase 13 — Verification & Testing
+
+The final configuration was tested rather than simply assuming the commands worked.
+
+The following areas were verified:
+
+### User Existence
+Verified with:
+
+getent passwd analyst
+
+getent passwd developer
+
+### Group Existence
+Verified with:
+
+getent group cybersecurity
+
+getent group developers
+
+### User Group Membership
+Verified with:
+
+groups analyst
+
+groups developer
+
+### User IDs
+Verified with:
+
+id analyst
+
+id developer
+
+### User Identity
+Verified with:
+
+whoami
+
+### Administrative Access
+
+Analyst:
+
+sudo whoami
+
+Expected result:
+
+root
+
+Developer:
+
+sudo whoami
+
+Expected result:
+
+Access denied because the developer account was not authorized for sudo.
+
+### Password Policy
+
+Verified with:
+
+sudo chage -l analyst
+
+sudo chage -l developer
+
+### Password Status
+
+Verified with:
+
+sudo passwd -S analyst
+
+sudo passwd -S developer
+
+---
+
+# Security Concepts Demonstrated
+
+This project demonstrated several important cybersecurity and Linux administration concepts.
+
+## 1. Principle of Least Privilege
+
+Users should only receive the permissions required for their job.
+
+The developer account was intentionally prevented from using sudo.
+
+## 2. Role-Based Access Control
+
+Groups were used to organize users according to their responsibilities.
+
+Examples:
+
+cybersecurity
+
+developers
+
+labadmins
+
+## 3. Privilege Separation
+
+Administrative access was separated from normal user access.
+
+The analyst account received sudo privileges while the developer account did not.
+
+## 4. Authentication Management
+
+Individual passwords were created and managed for separate user accounts.
+
+## 5. Password Lifecycle Management
+
+Password aging and status information were examined using Linux account-management utilities.
+
+## 6. Account Verification
+
+User IDs, groups, passwords, and sudo privileges were verified after configuration.
+
+## 7. Remote Administration
+
+All administration was performed remotely using SSH from the 2015 MacBook Air.
+
+---
+
+# Commands Learned
+
+The project provided hands-on experience with the following Linux commands:
+
+whoami
+hostname
+uptime
+getent passwd
+getent group
+groupadd
+useradd
+passwd
+usermod
+groups
+id
+su
+sudo
+chage
+
+These commands provide a foundation for Linux system administration and cybersecurity account management.
+
+---
+
+# Project Result
+
+The project successfully created a basic role-based Linux account management environment on the Raspberry Pi.
+
+The system now contains separate accounts for cybersecurity administration and development activities, with group memberships and administrative privileges assigned according to role.
+
+The analyst account was configured for cybersecurity and laboratory administration and given sudo access.
+
+The developer account was configured as a standard development user without sudo privileges.
+
+The configuration was verified through multiple identity, group, password, and privilege checks.
+
+The entire project was administered remotely from a 2015 MacBook Air through an SSH connection to the Raspberry Pi.
+
+---
+
+# Skills Demonstrated
+
+- Linux user administration
+- Linux group administration
+- Account provisioning
+- Password management
+- Password aging
+- SSH remote administration
+- Role-Based Access Control (RBAC)
+- Principle of Least Privilege
+- Sudo administration
+- Privilege separation
+- User and group verification
+- Linux command-line administration
+- Basic system security
+- Remote system management
+- Cybersecurity laboratory administration
+
+---
+
+# Portfolio Evidence
+
+Screenshots were captured throughout the project to document:
+
+- SSH connection from the MacBook Air to the Raspberry Pi
+- Group creation
+- User creation
+- Password configuration
+- Group membership
+- User IDs
+- Sudo configuration
+- Analyst administrative access
+- Developer sudo restriction
+- Password aging information
+- Final account configuration
+
+These screenshots provide visual evidence that the configuration was performed and tested on a functioning Linux system.
+
+---
+
+# Project Completion
+
+Status: COMPLETED
+
+Primary System: Raspberry Pi 5
+
+Remote Administration Device: 2015 MacBook Air
+
+Operating System: Raspberry Pi OS
+
+Access Method: SSH
+
+Primary Security Concepts:
+- Account Management
+- RBAC
+- Least Privilege
+- Privilege Separation
+- Authentication
+- Password Management
+- Remote Administration
+
+Project 3 demonstrates practical Linux system administration and foundational cybersecurity skills through the creation, configuration, and verification of a role-based user management environment.
